@@ -1,0 +1,23 @@
+\documentclass{article}
+\usepackage{hyperref}
+
+\title{Midterm Report for Project 1 of Bigdata Analysis}
+\author{}
+\begin{document}
+	\maketitle
+	\section{Topic Selection}
+	We plan to write a literature review of \emph{Convexified Convolutional Neural Networks}\footnote{\url{https://arxiv.org/pdf/1609.01000.pdf}}.\\
+	We know that a classical convolutional neural network(CNN) as a function is not convex in general, which is known to be NP-hard to solve by the standard approach. What's more, it has two drawbacks. First, the rate of convergence of stochastic gradient method(SGD) can be slow due to the nonconvexity. Second, its
+	statistical properties are very difficult to understandd, as the actual performance is determined by
+	some combination of the CNN architecture along with the optimization algorithm.\\
+	We thus find it really interesting to make a CNN convex and address the two drawbacks above.\\
+	\section{The Plan}
+	Our plan is as follows.
+	\begin{enumerate}
+		\item Understand the structure of Convexified Convolutional Neural Networks(CCNN) in this paper.
+		\item Organize all relative references and find the development of the relevant ideas.
+		\item Implement a CCNN with TensorFlow, and compare it with other CNN using MNIST and Cifar-10.
+	\end{enumerate}
+	
+
+\end{document}
