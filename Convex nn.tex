@@ -1,0 +1,89 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\title{Convex Neural Network}
+\author{Jianhao Shen}
+
+\begin{document}
+\maketitle
+\section{Main Idea}
+The paper has shown that training a NN can be seen as a convex optimization problem, but has infinite hidden units. By choosing a regularizer that promotes sparse solutions(e.g., $L^{1}$ regularizetion),
+ the solution will have a finite number of ``active" hidden units, but the problem still consists of a large number of variables. An effective approach to this problem is to add one hidden unit at a time and stop once the global optimum is reached so that not all possible hidden units are visited.
+\section{convex NN}
+Neural Network(NN) is a function of the form $\hat{y}(x) = \sum_{i=1}^{m} w_{i} h_{i}(x)$ where $x$ is an input vector, $h_{i}(x)$ are hidden units and $w_{i}$ are weight values. Hidden units are obtained from a linear discriminant function: $h_{i}(x) = s(v_{i}x+b_{i})$ where $s(a)$ is an nonlinear function, e.g. $s(a) = tanh(a)$ or $s(a) = \frac{1}{1+e^{-a}}$. A loss function $Q(y,\hat{y})$ is introduced to measure the mismatches between the prediction $\hat{y}(x_{i})$ and the observed y. A regularizer $\Omega(w)$ is introduced to favor smaller parameters, e.g. a $L^{1}$ regularizer promotes sparse solutions. With notations above, we want to solve the optimization problem:
+\begin{equation}
+\min_{m,w,v} \Omega(w) + \sum_{i=1}^{n}Q(y_{i},\hat{y_{i}}(x_{i})) 
+\end{equation}
+where \{$(x_{i},y_{i})$\} is the observed data set. 
+
+This problem is not convex, even if $\Omega(w)$ and $Q(y,\hat{y})$ are convex, since the hidden units $h_{i}(x) = s(v_{i}x+b)$ is not convex w.r.t. $v_{i}$ because of the nonlinear function s(a). Notice that the non-convexity only lies in $v_{i}$ which determine the chosen hidden units, the problem can be converted into a convex one by including all hidden units in our NN and only tuning $w_{i}$ to determine both chosen hidden units and weight values(i.e., a hidden unit is chosen iff the corresponding weight value is nonzero). More specifically, we define the ``infinite"" NN:
+\newtheorem{defn}{Definition}[section]
+\begin{defn}
+Let $\mathcal{H}$ be a set of functions from an input space $\mathcal{X}$ to $\mathbb{R}$. Elements of $\mathcal{H}$ can be understood as ``hidden units" in a NN. Let $\mathcal{W}$ be the Hilbert space of functions from $\mathcal{H}$ to $\mathbb{R}$, with an inner product denoted by a $\cdot$ b for a, b $\in \mathcal{W}$. An element of $\mathcal{W}$ can be understood as the output weights vector in a NN. Let $h(x):\mathcal{H}\rightarrow \mathbb{R}$ the function that maps any element $h_{i}$ of $\mathcal{H}$ to $h_{i}(x)$. $h(x)$ can be understood as the vector of activations of hidden units when input x is observed. Let $w \in \mathcal{W}$ represent a parameter(the output weights). The NN prediction is denoted $\hat{y}(x)= w\cdot h(x)$. Let $Q:\mathbb{R}\times \mathbb{R} \rightarrow \mathbb{R}$ be a cost function convex in its second argument that takes a scalar target value y and a scalar prediction $\hat{y}(x)$ and returns a scalar cost. This is the cost to be minimized on example pair (x, y). Let $D = \{ (x_{i},y_{i}:1\le i \le n)\}$ a training set.Let $\Omega : \mathcal{W} \rightarrow \mathbb{R}$ be a convex regularization function that penalizes for the choice of more ``complex" parameters. We define the convex NN criterion $C(\mathcal{H}, Q, \Omega, D, w)$ with parameter $w$ as follows:
+\begin{equation}
+C(\mathcal{H}, Q, \Omega, D, w) = \Omega(w) + \sum_{t=1}^{n}Q(y_{t}, w \cdot h(x_{t}))
+\end{equation}
+\end{defn}
+
+It is easy to see that the convex NN cost $C(\mathcal{H}, Q, \Omega, D, w)$ is a convex function of $w$, but has infinite hidden units, which cannot be trained. However, with regularizer that promotes sparse solutions like $L^{1}$ regularizer, it can be proved that the solution has finite hidden units. We show the special case with $Q(y,\hat{y}) = max(0, 1-y\hat{y})$ and $L^{1}$ regularization, and the training criterion is 
+\begin{equation}
+C(w) = K\lVert w \rVert_{1} + \sum_{t=1}^{n}max(0, 1-y_{t}w\cdot h(x_{t}))
+\end{equation}
+We can rewrite this cost function as:
+\begin{equation}
+\min_{w, \xi} K \lVert w \rVert_{1} + \sum_{t=1}^{n} \xi_{t}
+\end{equation}
+such that
+\begin{gather}
+y_{t}[w\cdot h(x_{t})] \ge 1 - \xi_{t}\\
+\xi_{t} \ge 0, t=1,...,n
+\end{gather}
+Then we derive the dual problem (P):
+\begin{equation}
+\max_{\lambda} \sum_{t=1}^{n} \lambda_{t}
+\end{equation}
+such that
+\begin{gather}
+\lambda \cdot Z_{i} - K \le 0, i \in I\\
+\lambda_{t} \le 1, t=1,...,n
+\end{gather}
+where $(Z_{i})_{t}= y_{t}h_{i}(x_{t})$,and I is the index set of hidden units. Such a problem follows Theorem 4.2 from (Hettich and Kortanek, 1993), and the following theorem holds:
+\newtheorem{tem}{Theorem}[section]
+\begin{tem}
+The solution of (P) can be attained with constraints $C_{2}^{'}$ and only $n + 1$ constraints $C_{1}^{'}$(i.e., there exists a subset of n+1 constraints $C_{1}^{'}$ giving rise to the same maximum
+as when using the whole set of constraints). Therefore, the primal problem associated is the
+minimization of the cost function of a NN with n + 1 hidden neurons.
+\end{tem}
+This convex NN can be optimized by a stepwise algorithm, which is shown as follows:
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\begin{algorithm}[htb]
+\caption{Convex(NN)}
+\begin{algorithmic}[1]
+\REQUIRE
+training set $D = \{ (x_{1},y{1}),...,(x_{n},y_{n})\}$, convex loss function $Q$, and scalar regularization penalty $\lambda$.s is either the $sign$ function or the $tanh$ function.
+\STATE Set $v_{1} = (0,0,...,1)$ and select $w_{1} = argmin_{w_{1}} \sum_{t} Q(y_{t},w_{1}s(1))+\lambda \lvert w_{1} \rvert$
+\STATE Set $i = 2$
+\WHILE{True}
+  \STATE Let $q_{t} = Q^{'}(y_{t},\sum_{j=1}^{i-1} w_{j}h_{j}(x_t))$
+  \IF{s=$sign$}
+    \STATE train linear classifier $h_{i}(x) = sign(v_{i}\cdot \tilde{x})$ with examples $\{(x_{t}, sign(q_{t}))\}$ and errors weighted by $\lvert q_{t} \rvert, t=1,...,n$.(i.e., $maximize \sum_{t} q_{t}h_{i}(x_{t})$)
+  \ELSIF{s=$tanh$}
+    \STATE train linear classifier $h_{i}(x) = tanh(v_{i}\cdot \tilde{x})$ to $maximize \sum_{t} q_{t}h_{i}(x_{t})$
+  \ENDIF
+  \IF{$\sum_{t} q_{t}h_{i}(x_{t})\le \lambda$}
+    \STATE stop
+  \ENDIF
+  \STATE select $w_{1},...,w_{i}$(and optimally $v_{2},...,v_{i}$) minimizing (exactly or approximally) $C = \sum_{t}Q(y_{t},\sum_{j=1}^{i} w_{j}h_{j}(x_{t})) + \lambda \sum_{j}\lvert w_{j} \rvert$ such that 
+$\frac{\partial C}{\partial w_{j}} = 0$ for $j=1,...,i$
+  \STATE Return the predictor $\hat{y}(x) = \sum_{j=1}^{i} w_{j}h_{j}(x)$
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
+
+And it can be proved that Alogrithm convex NN stops when it reaches the global optimum of $C(w)$. However, finding a linear classifier that minimize the weighted sum of classfication errors is an NP-hard problem, which can only be solved  efficiently when the input dimension is low. For high dimension input, we can implement approximate minimization, which turns out to perform well in practice.
+\end{document}
