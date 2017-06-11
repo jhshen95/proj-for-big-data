@@ -12,7 +12,7 @@
 \begin{document}
 \maketitle
 \section{Main Idea}
-The paper has shown that training a NN can be seen as a convex optimization problem, but has infinite hidden units. By choosing a regularizer that promotes sparse solutions(e.g., $L^{1}$ regularizetion),
+The paper: Benjio, Y., Convex Neural Networks, has shown that training a NN can be seen as a convex optimization problem, but has infinite hidden units. By choosing a regularizer that promotes sparse solutions(e.g., $L^{1}$ regularizetion),
  the solution will have a finite number of ``active" hidden units, but the problem still consists of a large number of variables. An effective approach to this problem is to add one hidden unit at a time and stop once the global optimum is reached so that not all possible hidden units are visited.
 \section{convex NN}
 Neural Network(NN) is a function of the form $\hat{y}(x) = \sum_{i=1}^{m} w_{i} h_{i}(x)$ where $x$ is an input vector, $h_{i}(x)$ are hidden units and $w_{i}$ are weight values. Hidden units are obtained from a linear discriminant function: $h_{i}(x) = s(v_{i}x+b_{i})$ where $s(a)$ is an nonlinear function, e.g. $s(a) = tanh(a)$ or $s(a) = \frac{1}{1+e^{-a}}$. A loss function $Q(y,\hat{y})$ is introduced to measure the mismatches between the prediction $\hat{y}(x_{i})$ and the observed y. A regularizer $\Omega(w)$ is introduced to favor smaller parameters, e.g. a $L^{1}$ regularizer promotes sparse solutions. With notations above, we want to solve the optimization problem:
@@ -85,5 +85,28 @@ $\frac{\partial C}{\partial w_{j}} = 0$ for $j=1,...,i$
 \end{algorithmic}
 \end{algorithm}
 
-And it can be proved that Alogrithm convex NN stops when it reaches the global optimum of $C(w)$. However, finding a linear classifier that minimize the weighted sum of classfication errors is an NP-hard problem, which can only be solved  efficiently when the input dimension is low. For high dimension input, we can implement approximate minimization, which turns out to perform well in practice.
+And it has been proved that Alogrithm convex NN stops when it reaches the global optimum of $C(w)$. However, finding a linear classifier that minimize the weighted sum of classfication errors is an NP-hard problem, which can only be solved  efficiently when the input dimension is low. For high dimension input, we can implement approximate minimization, which turns out to perform well in practice.
+
+In another paper: 2016, Francis Bach, Breaking the Curse of Dimensionality with Convex Neural Networks, the author gives a detailed analysis of generalization bound of different prediction functions, which is listed below:
+\begin{table}[htb]
+\begin{tabular}{|c|c|c|}
+\hline
+Model & Function form & Generalization bound\\
+\hline
+No assumption & & $n^{-1/(d+3)}log n$\\
+\hline
+Affine function & $w^\top x + b$ & $d^{1/2}\cdot n^{-1/2}$\\
+\hline
+Generalized additive model & $\sum_{j=1}^{k}f_{j}(w_{j}^\top x),w_{j}\in \mathbb{R}^{d}$ & $k d^{1/2}\cdot n^{-1/4}log n$\\
+\hline
+Single-layer neural network & $\sum_{j=1}^{k} \mu_{j} (w_{j}^\top x + b_{j})_{+}$ & $k d^{1/2} \cdot n^{-1/2}$\\
+\hline
+Projection pursuit & $\sum_{j=1}^{k} f_{j}(w_{j}^\top x), w_{j} \in \mathbb{R}^{d}$ & $k d^{1/2}\cdot n^{-1/4}log n$\\
+\hline
+Dependence on subspace & $f(W^\top x), W \in \mathbb{R}^{d \times s}$ & $d^{1/2}\cdot n^{-1/(s+3)}log n$\\
+\hline
+\end{tabular}
+\caption{Summary of generalization bounds for various models.}
+\end{table}
+
 \end{document}
