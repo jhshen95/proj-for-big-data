@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage{amsmath}
+\DeclareMathOperator{\tr}{tr}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{hyperref}
@@ -11,7 +12,6 @@
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
-
 
 \usepackage{cite}
 \bibliographystyle{plain}
@@ -28,13 +28,22 @@
 \section{Introduction}
 In this review, we analyze a two layer convexified convolutional neural network(CCNN) based on \cite{zhang2016convexified}, make a review of the related works and use some new methods to solve this problem.
 \section{A Brief Summary of the Main Ideas}
-The work in \cite{zhang2016convexified} is mainly about convexifying a two-layer convolutional neural network. Before it there is the convexification of a two-layer deep neural network work in \cite{aslan2013convex} and \cite{aslan2014convex}. The idea 
-\subsection{Convex Two Layer and Deep Learning}
-A convolutional neural network(CNN) can be written as a function $f(x)$,
-\[f:\mathbb{R}^{d_0}\rightarrow\mathbb{R}^{d_2},\] where $d_0$ is the dimension of input vectors $x$, $d_2$ is the number of classes.
+The work in \cite{zhang2016convexified} is mainly about convexifying a two-layer convolutional neural network. Before it there is the convexification of a multi-layer deep neural network(DNN) in \cite{aslan2014convex}, earlier than which is a more generalized two layer modeling in \cite{aslan2013convex}.
 
-Particularly, for a two layer convolutional neural network, the following form separates the trainable parameters and others,
-\[f^A(x):=(\text{tr}(Z(x)A_1),...,\text{tr}(Z(x)A_{d_2})),\]
+There are many advantages of a convex problem, like we won't stack at a local minimum. However, With the increase of layer number, the scale of both problems soon become not affordable, and even a two-layer CNN problem requires much more resource than a classical method.
+\subsection{Convex DNNs}
+As a common definition, an $n$-layer DNN can be written as \[f(x)=l_n\circ\cdots\circ l_2\circ l_1(x),\] where $l_i=A_i(w_i^Tx+b_i),i\in\left\lbrace 1,\cdots,n\right\rbrace $ with $A_i$ non-linear, often called an activation function. We will omit the bias term $b_i$ for simplicity. We also have a loss function $L(f(x);y)$ to measure the accuracy of the DNN, where $y$ is the label of $x$. Our aim is then to compute the $w$ such that
+\[w=\text{argmin}_{w}\sum_{x}L(f(x);y(x)).\]
+
+Now, suppose we have a three-layer DNN. The idea of convexifying it is \emph{relaxation}, which consists of two parts. We first relax the activation function, because it introduces strong non-convex to the model. This is done by change the optimization problem to
+\[\min_{W,U,V,\Phi,\Theta}L_1(WX,\Phi)+\frac{1}{2}\|W\|^2+L_2(U\Phi,\Theta)+\frac{1}{2}\|U\|^2+L_3(V\Theta,Y)+\frac{1}{2}\|V\|^2.\]
+Let's explain the above problem. First, we omit the bias $b_i$ so there's no $b_i$. Second, $W,U,V$ are the parameters $w$ of the first, second, and third layer function $l_1,l_2,l_3$. Third, which is how we relax the activation function, we let $\Phi$ and $\Theta$ be the outputs of $L_1$ and $L_2$ respectively, and put them into the object function, i.e. they are now parameters as $U,V,W$. There are also new loss functions $L_1,L_2,L_3$, which connect the input of output in each layer. These non-linear loss functions replace the activation function. Finally, there are regularization terms $\|U\|^2,\|V\|^2,\|W\|^2$ to control the complexity of the model. They could be weighted but we omit the weights to make it simple.
+
+Now, the problem is how to make the new object function convex on the parameters $U,V,W,\Phi,\Theta$. Generally speaking, we relax, or split the parameters so that they or their representatives lie in a larger space.
+
+\subsection{Convex CNNs}
+In the case of CNN, the idea is also relaxation, but this time we keep the activation function, and relax the non-linear part as a whole. A convolutional neural network(CNN) can be written as a function $f(x)$. Particularly, for a two layer convolutional neural network, the following form separates the trainable parameters and others,
+\[f^A(x):=(\tr(Z(x)A_1),...,\tr(Z(x)A_{d_2})),\]
 where $A$ denotes all trainable parameters, and $Z$ only depends on the inputs.
 
 If the loss function $\mathcal{L}(f;y)$ is convex about $f$, $\mathcal{L}(f^A(Z))$ is convex about $A$. We can then solve the convex optimization problem
@@ -42,9 +51,41 @@ If the loss function $\mathcal{L}(f;y)$ is convex about $f$, $\mathcal{L}(f^A(Z)
 \widehat{A}\in\text{argmin}_{\|A\|_*\leq R}\tilde{\mathcal{L}}(A)
 \end{align*}
 where $\tilde{\mathcal{L}}(A)=\sum_{i=1}^n\mathcal{L}(f^A(x_n);y_n)$, $n$ is the size of mini-batch, $\|\cdot\|_*$ denotes the nuclear norm, and $R$ is a restriction. $\widehat{A}$ is then transformed to the corresponding parameters of the CNN. As a result, the original non-convex problem is tranformed to a convex one. 
+\section{The Construction of A Three-layer DNN}
+As mentioned, the problem we want to solve is 
+\begin{equation}\label{dnn}
+\min_{W,U,V,\Phi,\Theta}L_1(WX,\Phi)+\frac{1}{2}\|W\|^2+L_2(U\Phi,\Theta)+\frac{1}{2}\|U\|^2+L_3(V\Theta,Y)+\frac{1}{2}\|V\|^2.
+\end{equation}
+\eqref{dnn} is convex in $U,V,W$ given $\Phi,\Theta$, but not jointly convex in all of them, due to the interaction between $U,V,W$ and $\Phi,\Theta$. To tackle this problem, consider the part of \eqref{dnn} corresponding to the second layer,
+\begin{equation}\label{dnn2}
+	\min_U L(U\Phi,\Theta)+\frac{1}{2}\|U\|^2.
+\end{equation}
+What we want is to split $U$ and $\Phi$. By the \emph{representer theorem}, we know there is a matrix $A$ such that $U=A\Phi'$. Denote $Z=U\Phi=A\Phi'\Phi=AK$ where $K=\Phi'\Phi$. Notice that $\Phi$ is the input of layer 2, and $K$ is called the input kernel matrix. Then, we have 
+\[\|U\|^2=\tr(UU')=\tr(AKA')=\tr(AKK^\dagger KA')=\tr(ZK^\dagger Z'),\]
+where $K^\dagger$ is the Moore-Penrose pseudo-inverse(recall $KK^\dagger K=K$ and $K^\dagger KK^\dagger=K^\dagger$). \eqref{dnn2} can then be rewritten as
+\begin{equation}\label{dnn3}
+	\min_Z L(Z,\Theta)+\frac{1}{2}\tr(ZK^\dagger Z').
+\end{equation}
+We thus split $U$ and $\Phi$ by represent them to $Z$ and $K$.
+
+The another problem is that $\Phi$ and $\Theta$ serve as the input and output for different layers simultaneously. We must make \eqref{dnn2} convex in $U,\Phi,\Theta$ but \eqref{dnn3} is not convex in $\Theta$. To solve this problem, we assume the loss function satisfies an extra postulate, so that $\Theta$ is boolean valued, and thus we can get a reformulation.
+
+\textbf{Postulate 1.} $L(Z,\Theta)$ can be written as $L^u(\Theta'Z,\Theta'\Theta)$ for $L^u$ jointly convex in both arguments.
+
+The postulate may seem strange but it has backgrounds. The term $\Theta'Z$ is called a \emph{propensity matrix} and $\Theta'\Theta$ is called an unnormalized \emph{output kernel}, so now the loss function depends only on them. 
+
+Using Postulate 1 and $Z=U\Phi$, \eqref{dnn2} can be rewritten as $L^u(\Phi'U\Phi,\Theta'\Theta)+\frac{1}{2}\|U\|^2$. Now, denote $N:=\Theta'\Theta$ and $S:=\Theta'Z=\Theta'U\Phi$(hence $S\in\Theta'\mathbb{R}\Phi=N\mathbb{R}K$), \eqref{dnn2} can be rewritten as
+\[\min_SL^u(S,N)+\frac{1}{2}\tr(K^\dagger S'N^\dagger S).\]
+This objective is jointly convex in the propensity matrix $S$ and output kernel $N$. Notice that $N$ is positive semidefinite. Thus, to make \eqref{dnn2} convex, the final postulate should require the domain of $N$ to be convex.
+
+\textbf{Postulate 2.} The domain of $N=\Phi'\Phi$ can be relaxed to a convex set preserving sufficient structure.
+
+There is an relaxation approach in \cite{aslan2013convex}, which is only applicable for a single hidden layer network. A more generalized approach in \cite{aslan2014convex} is as follows.
+
+
+
 \section{The Construction of A Two-layer CCNN}
 A two-layer CCNN can be written as a function $f:\mathbb{R}^{d_0}\rightarrow\mathbb{R}^{d_2}$, which takes in a vector $x$ that is often the vector-representation of a picture. In the context of this review, the output $f(x)$ is a discrete distribution vector, i.e. the $k$th element $f_k(x)\in\left[0,1\right] $ denotes the probability of $x$ belonging to class $k$.
-
 
 In a common explanation, the construction of $f$ can be written as follows.
 
@@ -91,7 +132,7 @@ Now, let $\mathcal{L}(f(x),y)$ denote the loss function, where $y$ is the label 
 
 When $\sigma$ is a non-linear function, we transform the filter $h_{\sigma,w}(z_p(x))$ to a linear form by
 \[h(z_p(x_i))=\sum_{(i',p')\in[n]\times[P]}c_{i',p'}k(z_p(x_i),z_{p'}(x_{i'})),\]
-where $k$ is a positive semi-definite kernel function. Viewing $k(*,z_{p'}(x_{i'})),(i',p')\in[n]\times[P]$ as a basis, the filter $h$ is represented by $c_{i',p'}$. Now, let $K\in\mathbb{R}^{nP\times nP}$,
+where $k$ is a positive semi-definite kernel function. Viewing \[k(*,z_{p'}(x_{i'})),(i',p')\in[n]\times[P]\] as a basis, the filter $h$ is represented by $c_{i',p'}$. Now, let $K\in\mathbb{R}^{nP\times nP}$,
 \[K_{(i,p),(i',p')}=k(z_p(x_i),z_{p'}(x_{i'})).\]
 Consider a factorization $K=QQ^T$, where $Q\in\mathbb{R}^{nP\times m}$, we can rewrite $h$ by 
 \[h(z_p(x_i))=c^T(Q_{(i,p)}Q^T)^T=\langle Q_{(i,p)},c^TQ\rangle.\]
@@ -107,8 +148,6 @@ Suppose we have computed a result $A\in\mathbb{R}^{m\times Pd_2}$. At test time,
 Notice that the the $(i,p)$th row of $K$ corresponding to $z_p(x_i)$, denoted as $K_{(i,p)}$, is $K_{(i,p)}=Q_{(i,p)}Q^T$. Let $v(z_p(x))=(k(z_p(x),z_{p'}(x_{i'})))_{(i',p')}\in\mathbb{R}^{nP}$, we want to find the representation $c_x$ so that
 \[c_x=\text{argmin}_{c_x}\|v(z_p(x))^T-c_x^TQ^T\|_2^2=\|v(z_p(x))-Qc_x\|_2^2.\]
 The answer is $c_x=Q^\dagger v_p(x)$, where $v_p(x)=v(z_p(x))$. So we have $Z(x)=(Q^\dagger v(x))^T$.
-
-
 
 \begin{algorithm}
 \caption{Learning Two-layer Convexified Convolutional Neural Networks}\label{euclid}
