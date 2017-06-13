@@ -17,7 +17,7 @@
 \bibliographystyle{plain}
 
 \title{Report of Project 1\\A Review of Convexified Neural Network}
-\author{Xiaodong Jia 1601110031\\Jianhao Shen}
+\author{Xiaodong Jia 1601110031\\Jianhao Shen 1400010662}
 
 \begin{document}
 \maketitle
@@ -38,7 +38,7 @@ The work in \cite{zhang2016convexified} is mainly about convexifying a two-layer
 
 \section{A Brief Summary of the Main Ideas}
 \subsection{Convex Neural Networks}
-The work in \cite{bengio2006convex} shows that training an NN can be viewed as a convex optimization problem, but with infinite hidden units. By choosing a regularizer that promotes sparse solutions(e.g. $L^{1}$ regularizetion), 
+The work in \cite{bengio2006convex} shows that training an NN can be viewed as a convex optimization problem, but with infinite hidden units. By choosing a regularizer that promotes sparse solutions(e.g. $L^{1}$ regularization), 
 the solution will have a finite number of \emph{active} hidden units, but the problem still consists of a large number of variables. An effective approach to this problem is to add one hidden unit at a time and stop once the global optimum is reached so that not all possible hidden units are visited.
 \subsection{Convex DNNs}
 As a common definition, an $n$-layer DNN can be written as \[f(x)=l_n\circ\cdots\circ l_2\circ l_1(x),\] where $l_i=A_i(w_i^Tx+b_i),i\in\left\lbrace 1,\cdots,n\right\rbrace $ with $A_i$ non-linear, often called an activation function. We will omit the bias term $b_i$ for simplicity. We also have a loss function $L(f(x);y)$ to measure the accuracy of the DNN, where $y$ is the label of $x$. Our aim is then to compute the $w$ such that
@@ -61,16 +61,16 @@ If the loss function $\mathcal{L}(f;y)$ is convex about $f$, $\mathcal{L}(f^A(Z)
 \end{align*}
 where $\tilde{\mathcal{L}}(A)=\sum_{i=1}^n\mathcal{L}(f^A(x_n);y_n)$, $n$ is the size of mini-batch, $\|\cdot\|_*$ denotes the nuclear norm, and $R$ is a restriction. $\widehat{A}$ is then transformed to the corresponding parameters of the CNN. As a result, the original non-convex problem is tranformed to a convex one.
 \section{Convex NN}
-Neural Network(NN) is a function of the form $\hat{y}(x) = \sum_{i=1}^{m} w_{i} h_{i}(x)$ where $x$ is an input vector, $h_{i}(x)$ are hidden units and $w_{i}$ are weight values. Hidden units are obtained from a linear discriminant function: $h_{i}(x) = s(v_{i}x+b_{i})$ where $s(a)$ is an nonlinear function, e.g. $s(a) = tanh(a)$ or $s(a) = \frac{1}{1+e^{-a}}$. A loss function $Q(y,\hat{y})$ is introduced to measure the mismatches between the prediction $\hat{y}(x_{i})$ and the observed y. A regularizer $\Omega(w)$ is introduced to favor smaller parameters, e.g. a $L^{1}$ regularizer promotes sparse solutions. With notations above, we want to solve the optimization problem:
+Neural Network(NN) is a function of the form $\hat{y}(x) = \sum_{i=1}^{m} w_{i} h_{i}(x)$ where $x$ is an input vector, $h_{i}(x)$ are hidden units and $w_{i}$ are weight values. Hidden units are obtained from a linear discriminant function: $h_{i}(x) = s(v_{i}x+b_{i})$ where $s(a)$ is an nonlinear function, e.g. $s(a) = tanh(a)$ or $s(a) = \frac{1}{1+e^{-a}}$. A loss function $Q(y,\hat{y})$ is introduced to measure the mismatches between the prediction $\hat{y}(x_{i})$ and the observed $y_{i}$. A regularizer $\Omega(w)$ is introduced to favor smaller parameters, e.g. a $L^{1}$ regularizer promotes sparse solutions. With notations above, we want to solve the optimization problem:
 \begin{equation}
 \min_{m,w,v} \Omega(w) + \sum_{i=1}^{n}Q(y_{i},\hat{y_{i}}(x_{i})) 
 \end{equation}
-where \{$(x_{i},y_{i})$\} is the observed data set. 
+where \{$(x_{i},y_{i}):1 \le i \le n$\} is the observed data set. 
 
-This problem is not convex, even if $\Omega(w)$ and $Q(y,\hat{y})$ are convex, since the hidden units $h_{i}(x) = s(v_{i}x+b)$ is not convex w.r.t. $v_{i}$ because of the nonlinear function s(a). Notice that the non-convexity only lies in $v_{i}$ which determine the chosen hidden units, the problem can be converted into a convex one by including all hidden units in our NN and only tuning $w_{i}$ to determine both chosen hidden units and weight values(i.e., a hidden unit is chosen iff the corresponding weight value is nonzero). More specifically, we define the ``infinite"" NN:
+This problem is not convex, even if $\Omega(w)$ and $Q(y,\hat{y})$ are convex, since the hidden units $h_{i}(x) = s(v_{i}x+b)$ is not convex w.r.t.$v_{i}$ because of the nonlinear function s(a). Notice that the non-convexity only lies in $v_{i}$ which determine the chosen hidden units, the problem can be converted into a convex one by including all hidden units in our NN and only tuning $w_{i}$ to determine both chosen hidden units and weight values(i.e., a hidden unit is chosen iff the corresponding weight value is nonzero). More specifically, we define the ``infinite" NN:
 \newtheorem{defn}{Definition}[section]
 \begin{defn}
-	Let $\mathcal{H}$ be a set of functions from an input space $\mathcal{X}$ to $\mathbb{R}$. Elements of $\mathcal{H}$ can be understood as ``hidden units" in a NN. Let $\mathcal{W}$ be the Hilbert space of functions from $\mathcal{H}$ to $\mathbb{R}$, with an inner product denoted by a $\cdot$ b for a, b $\in \mathcal{W}$. An element of $\mathcal{W}$ can be understood as the output weights vector in a NN. Let $h(x):\mathcal{H}\rightarrow \mathbb{R}$ the function that maps any element $h_{i}$ of $\mathcal{H}$ to $h_{i}(x)$. $h(x)$ can be understood as the vector of activations of hidden units when input x is observed. Let $w \in \mathcal{W}$ represent a parameter(the output weights). The NN prediction is denoted $\hat{y}(x)= w\cdot h(x)$. Let $Q:\mathbb{R}\times \mathbb{R} \rightarrow \mathbb{R}$ be a cost function convex in its second argument that takes a scalar target value y and a scalar prediction $\hat{y}(x)$ and returns a scalar cost. This is the cost to be minimized on example pair (x, y). Let $D = \{ (x_{i},y_{i}:1\le i \le n)\}$ a training set.Let $\Omega : \mathcal{W} \rightarrow \mathbb{R}$ be a convex regularization function that penalizes for the choice of more ``complex" parameters. We define the convex NN criterion $C(\mathcal{H}, Q, \Omega, D, w)$ with parameter $w$ as follows:
+	Let $\mathcal{H}$ be a set of functions from an input space $\mathcal{X}$ to $\mathbb{R}$. Elements of $\mathcal{H}$ can be understood as ``hidden units" in a NN. Let $\mathcal{W}$ be the Hilbert space of functions from $\mathcal{H}$ to $\mathbb{R}$, with an inner product denoted by a $\cdot$ b for a, b $\in \mathcal{W}$. An element of $\mathcal{W}$ can be understood as the output weights vector in a NN. Let $h(x):\mathcal{H}\rightarrow \mathbb{R}$ the function that maps any element $h_{i}$ of $\mathcal{H}$ to $h_{i}(x)$. $h(x)$ can be understood as the vector of activations of hidden units when input x is observed. Let $w \in \mathcal{W}$ represent a parameter(the output weights). The NN prediction is denoted $\hat{y}(x)= w\cdot h(x)$. Let $Q:\mathbb{R}\times \mathbb{R} \rightarrow \mathbb{R}$ be a cost function convex in its second argument that takes a scalar target value y and a scalar prediction $\hat{y}(x)$ and returns a scalar cost. This is the cost to be minimized on example pair (x, y). Let $D = \{ (x_{i},y_{i}):1\le i \le n\}$ a training set.Let $\Omega : \mathcal{W} \rightarrow \mathbb{R}$ be a convex regularization function that penalizes for the choice of more ``complex" parameters. We define the convex NN criterion $C(\mathcal{H}, Q, \Omega, D, w)$ with parameter $w$ as follows:
 	\begin{equation}
 	C(\mathcal{H}, Q, \Omega, D, w) = \Omega(w) + \sum_{t=1}^{n}Q(y_{t}, w \cdot h(x_{t}))
 	\end{equation}
@@ -105,13 +105,14 @@ where $(Z_{i})_{t}= y_{t}h_{i}(x_{t})$,and I is the index set of hidden units. S
 	as when using the whole set of constraints). Therefore, the primal problem associated is the
 	minimization of the cost function of a NN with n + 1 hidden neurons.
 \end{tem}
-This convex NN can be optimized by a stepwise algorithm, which is shown as follows:
+This convex NN can be optimized by a stepwise algorithm, which is shown in Algorithm \ref{algorithm:stepNN}:
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \begin{algorithm}[htb]
 	\caption{Convex(NN)}
+	\label{algorithm:stepNN}
 	\begin{algorithmic}[1]
 		\REQUIRE
-		training set $D = \{ (x_{1},y{1}),...,(x_{n},y_{n})\}$, convex loss function $Q$, and scalar regularization penalty $\lambda$.s is either the $sign$ function or the $tanh$ function.
+		training set $D = \{ (x_{1},y_{1}),...,(x_{n},y_{n})\}$, convex loss function $Q$, and scalar regularization penalty $\lambda$.s is either the $sign$ function or the $tanh$ function.
 		\STATE Set $v_{1} = (0,0,...,1)$ and select $w_{1} = argmin_{w_{1}} \sum_{t} Q(y_{t},w_{1}s(1))+\lambda \lvert w_{1} \rvert$
 		\STATE Set $i = 2$
 		\WHILE{True}
@@ -133,7 +134,7 @@ This convex NN can be optimized by a stepwise algorithm, which is shown as follo
 
 And it has been proved that Alogrithm convex NN stops when it reaches the global optimum of $C(w)$. However, finding a linear classifier that minimize the weighted sum of classfication errors is an NP-hard problem, which can only be solved  efficiently when the input dimension is low. For high dimension input, we can implement approximate minimization, which turns out to perform well in practice.
 
-In another paper \cite{oseledets2009breaking}, the author gives a detailed analysis of generalization bound of different prediction functions, which is listed below:
+In another paper \cite{oseledets2009breaking}, the author gives a detailed analysis of generalization bound of different prediction functions, which is listed below in Table \ref{table:bounds}:
 \begin{table}[htb]
 	\begin{tabular}{|c|c|c|}
 		\hline
@@ -153,6 +154,7 @@ In another paper \cite{oseledets2009breaking}, the author gives a detailed analy
 		\hline
 	\end{tabular}
 	\caption{Summary of generalization bounds for various models.}
+	\label{table:bounds}
 \end{table}
 \section{The Construction of A Three-layer DNN}
 As mentioned, the problem we want to solve is 
