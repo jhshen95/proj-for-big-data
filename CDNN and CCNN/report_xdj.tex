@@ -1,0 +1,224 @@
+\documentclass{article}
+\usepackage{amsmath}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\rank}{rank}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\makeatletter
+\def\BState{\State\hskip-\ALG@thistlm}
+\makeatother
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\usepackage{cite}
+\bibliographystyle{plain}
+
+\title{Report of Project 1\\A Review of Convexified Neural Network}
+\author{Xiaodong Jia 1601110031\\Jianhao Shen}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+In this review, we analyze a two layer convexified convolutional neural network(CCNN) based on \cite{zhang2016convexified}, make a review of the related works and use some new methods to solve this problem.
+\section{A Brief Summary of the Main Ideas}
+The work in \cite{zhang2016convexified} is mainly about convexifying a two-layer convolutional neural network. Before it there is the convexification of a multi-layer deep neural network(DNN) in \cite{aslan2014convex}, earlier than which is a more generalized two layer modeling in \cite{aslan2013convex}.
+
+There are many advantages of a convex problem, like we won't stack at a local minimum. However, With the increase of layer number, the scale of both problems soon become not affordable, and even a two-layer CNN problem requires much more resource than a classical method.
+\subsection{Convex DNNs}
+As a common definition, an $n$-layer DNN can be written as \[f(x)=l_n\circ\cdots\circ l_2\circ l_1(x),\] where $l_i=A_i(w_i^Tx+b_i),i\in\left\lbrace 1,\cdots,n\right\rbrace $ with $A_i$ non-linear, often called an activation function. We will omit the bias term $b_i$ for simplicity. We also have a loss function $L(f(x);y)$ to measure the accuracy of the DNN, where $y$ is the label of $x$. Our aim is then to compute the $w$ such that
+\[w=\text{argmin}_{w}\sum_{x}L(f(x);y(x)).\]
+
+Now, suppose we have a three-layer DNN. The idea of convexifying it is \emph{relaxation}, which consists of two parts. We first relax the activation function, because it introduces strong non-convex to the model. This is done by change the optimization problem to
+\[\min_{W,U,V,\Phi,\Theta}L_1(WX,\Phi)+\frac{1}{2}\|W\|^2+L_2(U\Phi,\Theta)+\frac{1}{2}\|U\|^2+L_3(V\Theta,Y)+\frac{1}{2}\|V\|^2.\]
+Let's explain the above problem. First, we omit the bias $b_i$ so there's no $b_i$. Second, $W,U,V$ are the parameters $w$ of the first, second, and third layer function $l_1,l_2,l_3$. Third, which is how we relax the activation function, we let $\Phi$ and $\Theta$ be the outputs of $L_1$ and $L_2$ respectively, and put them into the object function, i.e. they are now parameters as $U,V,W$. There are also new loss functions $L_1,L_2,L_3$, which connect the input of output in each layer. These non-linear loss functions replace the activation function. Finally, there are regularization terms $\|U\|^2,\|V\|^2,\|W\|^2$ to control the complexity of the model. They could be weighted but we omit the weights to make it simple.
+
+Now, the problem is how to make the new object function convex on the parameters $U,V,W,\Phi,\Theta$. Generally speaking, we relax, or split the parameters so that they or their representatives lie in a larger space.
+
+\subsection{Convex CNNs}
+In the case of CNN, the idea is also relaxation, but this time we keep the activation function, and relax the non-linear part as a whole. A convolutional neural network(CNN) can be written as a function $f(x)$. Particularly, for a two layer convolutional neural network, the following form separates the trainable parameters and others,
+\[f^A(x):=(\tr(Z(x)A_1),...,\tr(Z(x)A_{d_2})),\]
+where $A$ denotes all trainable parameters, and $Z$ only depends on the inputs.
+
+If the loss function $\mathcal{L}(f;y)$ is convex about $f$, $\mathcal{L}(f^A(Z))$ is convex about $A$. We can then solve the convex optimization problem
+\begin{align*}
+\widehat{A}\in\text{argmin}_{\|A\|_*\leq R}\tilde{\mathcal{L}}(A)
+\end{align*}
+where $\tilde{\mathcal{L}}(A)=\sum_{i=1}^n\mathcal{L}(f^A(x_n);y_n)$, $n$ is the size of mini-batch, $\|\cdot\|_*$ denotes the nuclear norm, and $R$ is a restriction. $\widehat{A}$ is then transformed to the corresponding parameters of the CNN. As a result, the original non-convex problem is tranformed to a convex one. 
+\section{The Construction of A Three-layer DNN}
+As mentioned, the problem we want to solve is 
+\begin{equation}\label{dnn}
+\min_{W,U,V,\Phi,\Theta}L_1(WX,\Phi)+\frac{1}{2}\|W\|^2+L_2(U\Phi,\Theta)+\frac{1}{2}\|U\|^2+L_3(V\Theta,Y)+\frac{1}{2}\|V\|^2.
+\end{equation}
+\eqref{dnn} is convex in $U,V,W$ given $\Phi,\Theta$, but not jointly convex in all of them, due to the interaction between $U,V,W$ and $\Phi,\Theta$. To tackle this problem, \cite{aslan2013convex} consider the part of \eqref{dnn} corresponding to the second layer,
+\begin{equation}\label{dnn2}
+	\min_U L(U\Phi,\Theta)+\frac{1}{2}\|U\|^2.
+\end{equation}
+What we want is to split $U$ and $\Phi$. By the \emph{representer theorem}, we know there is a matrix $A$ such that $U=A\Phi'$. Denote $Z=U\Phi=A\Phi'\Phi=AK$ where $K=\Phi'\Phi$. Notice that $\Phi$ is the input of layer 2, and $K$ is called the input kernel matrix. Then, we have 
+\[\|U\|^2=\tr(UU')=\tr(AKA')=\tr(AKK^\dagger KA')=\tr(ZK^\dagger Z'),\]
+where $K^\dagger$ is the Moore-Penrose pseudo-inverse(recall $KK^\dagger K=K$ and $K^\dagger KK^\dagger=K^\dagger$). \eqref{dnn2} can then be rewritten as
+\begin{equation}\label{dnn3}
+	\min_Z L(Z,\Theta)+\frac{1}{2}\tr(ZK^\dagger Z').
+\end{equation}
+We thus split $U$ and $\Phi$ by represent them to $Z$ and $K$.
+
+The another problem is that $\Phi$ and $\Theta$ serve as the input and output for different layers simultaneously. We must make \eqref{dnn2} convex in $U,\Phi,\Theta$ but \eqref{dnn3} is not convex in $\Theta$. To solve this problem, we assume the loss function satisfies an extra postulate, so that $\Theta$ is boolean valued, and thus we can get a reformulation.
+
+\textbf{Postulate 1.} $L(Z,\Theta)$ can be written as $L^u(\Theta'Z,\Theta'\Theta)$ for $L^u$ jointly convex in both arguments.
+
+The postulate may seem strange but it has backgrounds. The term $\Theta'Z$ is called a \emph{propensity matrix} and $\Theta'\Theta$ is called an unnormalized \emph{output kernel}, so now the loss function depends only on them. 
+
+Using Postulate 1 and $Z=U\Phi$, \eqref{dnn2} can be rewritten as $L^u(\Phi'U\Phi,\Theta'\Theta)+\frac{1}{2}\|U\|^2$. Now, denote $N:=\Theta'\Theta$ and $S:=\Theta'Z=\Theta'U\Phi$(hence $S\in\Theta'\mathbb{R}\Phi=N\mathbb{R}K$), \eqref{dnn2} can be rewritten as
+\begin{equation}\label{dnn4}
+\min_SL^u(S,N)+\frac{1}{2}\tr(K^\dagger S'N^\dagger S).
+\end{equation}
+This objective is jointly convex in the propensity matrix $S$ and output kernel $N$. Notice that $N$ is positive semidefinite. Thus, to make \eqref{dnn2} convex, the final postulate should require the domain of $N$ to be convex.
+
+\textbf{Postulate 2.} The domain of $N=\Phi'\Phi$ can be relaxed to a convex set preserving sufficient structure.
+
+There is an relaxation approach in \cite{aslan2013convex}, which is only applicable for a single hidden layer network. A more generalized approach in \cite{aslan2014convex} is as follows.
+
+Let's reconsider \eqref{dnn2}. This time we change the form of it to 
+\begin{equation}\label{dnn5}
+	\min_UL(U\Phi,\Theta)+\frac{1}{2}\|\Theta'U\|^2.
+\end{equation}
+One can see we only change the regularization term $\|U\|^2$ to $\|Theta'U\|$. A key fact is that $U$ still satisfy the representer theorem under this change, so we have $U=(\Theta\Theta')^\dagger A\Phi'$ for some $A$. Generally speaking, $\Theta$ has full row rank, so we can use a change of variables $A=\Theta B$, and our regularization becomes \[\|\Theta'U\|^2=\|\Theta'(\Theta\Theta')^\dagger A\Phi'\|^2=\|\Theta'(\Theta\Theta')^\dagger\Theta B\Phi'\|^2.\]
+Now, we define $M:=\Theta'(\Theta\Theta')^\dagger\Theta$ to be the \emph{normalized output kernel}. The term $(\Theta\Theta')^\dagger$ essentially normalizes the spectrum of the kernel $\Theta'\Theta$, and, since $M^2=M$, we must have the eigenvalues of $M$, $\lambda_{M}=\left\lbrace 0,1\right\rbrace$. Finally, the regularization term can be rewritten as
+\[\|MB\Phi'\|^2=\tr(MBKB'M)=\tr(MBKK^\dagger KB'M)=\tr(SK^\dagger S'),\]
+where $S=MBK$. Another important fact is that we have 
+\[S=MBK=\Theta'(\Theta\Theta')^\dagger\Theta BK=\Theta'(\Theta\Theta')^\dagger AK=\Theta'(\Theta\Theta')^\dagger A\Phi'\Phi=\Theta'U\Phi.\]
+
+Now, to make the form convex, we need other structures on $L$. We rewrite Postulate 1 so that it holds for \emph{normalized} kernel matrix.
+
+\textbf{Postulate 3.} The loss $L(Z,\Theta)$ can be written as $L^n(\Theta'Z,\Theta'(\Theta\Theta')^\dagger)$, where $L^n$ is jointly convex
+in both arguments. Here the $n$ of $L^n$ emphasizes the use of normalized kernels.
+
+By Postulate 3, \eqref{dnn5} can be rewritten as
+\begin{equation}\label{dnn6}
+L^n(S,M)+\frac{1}{2}\tr(SK^\dagger S'),\quad\text{where }S\in M\mathbb{R}K.
+\end{equation}
+which is jointly convex in $S,M,K$. Compared to \eqref{dnn4}, one can see that the output kernel $N$ has been removed from the regularization. What's more, the feasible region $\left\lbrace (S,M,K):M\succeq0,K\succeq0,S\in M\mathbb{R}K\right\rbrace$ is also convex.
+
+Now, we can apply \eqref{dnn3} to the first two layers and \eqref{dnn6} to the output layer, so that the objective in \eqref{dnn} becomes
+\begin{equation}\label{obj}
+	\begin{aligned}
+	&L_1^n(S_1,M_1)+\frac{1}{2}\tr(S_1K^\dagger S_1')\\
+	+&L_2^n(S_2,M_2)+\frac{1}{2}\tr(S_2M_1^\dagger S_2')\\
+	+&L_3(Z_3,Y)+\frac{1}{2}\tr(Z_3M_2^\dagger Z_3'),
+	\end{aligned}
+\end{equation}
+
+where $S_1\in M_1\mathbb{R}K$, $S_2\in M_2\mathbb{R}M_1$ , and $Z_3\in \mathbb{R}M_2$.
+
+Recall that we should make the domain of $M$ convex and the loss functions $L^n$ satisfy postulate 3.
+
+The output kernels $M:=\Theta'(\Theta\Theta')^\dagger\Theta$ has no convex domain in general. We want to relax $M$, such that they preserve the nice properties including
+\[M\succeq0,M\preceq I,\tr(M)=\tr((\Theta\Theta')^\dagger(\Theta\Theta'))=\rank(\Theta\Theta')=\rank(\Theta),\]
+for any $\Theta$. Here, $M\succeq0$ denotes that $M$ is a symmetric semi-positive matrix. So, given a number of hidden nodes, $h$, we will enforce $\tr(M)=h$. We further relax the property $\lambda_{M}=\left\lbrace 0,1\right\rbrace $ to $\forall \lambda_i\in\lambda_{M}$, $0\leq \lambda_i\leq 1$. A final relaxation would be $M\mathbf{1}=\mathbf{1}$, which holds when $\Theta$ expresses target values for a multiclass classification, i.e. $\Theta_{ij}\in\left\lbrace 0,1\right\rbrace$, $\Theta'\mathbf{1}=1$, representing each index of the cluster.
+
+We then relax $M$ to the followings domain,
+\begin{equation}\label{mdomain}
+	\mathcal{M}:=\left\lbrace M|0\preceq M\preceq I,M\mathbf{1}=\mathbf{1},\tr(M)=h\right\rbrace.
+\end{equation}
+
+The last thing is to give a appropriate loss function. An example was put in \cite{aslan2013convex}, which use a large margin, multi-label loss
+\[\tilde{L}(z,y)=\max(1-y+kz-\mathbf{1}(y'z))\]
+where $z$ is a linear response and $y\in\left\lbrace 0,1\right\rbrace^h $ is the target vector. This example can be adapted to a normalized case as follows. We first generalize the notion of margin to consider a \emph{normalized label} $(YY')^\dagger y$:
+\[L(z,y)=\max(1-(YY')^\dagger y+kz-\mathbf{1}(y'z)).\]
+Then, given $t$ input-output pairs $(Z,Y)$, we can rewrite the loss to a compact form as
+\[L(Z,Y)=\sum_jL(z_j,y_j)= \tau(kZ−(YY')^\dagger Y)+t−\tr(Y'Z),\]
+where $\tau(X):=\sum_j\max_i X_{ij}$. As a result, the loss below can be shown to satisfy Postulate 3,
+\begin{equation}\label{dnnloss}
+L^n(S,M)=\tau(S-\frac{1}{k}M)+t-tr(S),\quad\text{where }S=Y'Z,M=Y'(YY')^\dagger Y.
+\end{equation}
+Thus, by \eqref{obj}, \eqref{mdomain} and \eqref{dnnloss}, we reformulate the original three-layer NN problem to a convex form.
+
+\section{The Construction of A Two-layer CCNN}
+A two-layer CCNN can be written as a function $f:\mathbb{R}^{d_0}\rightarrow\mathbb{R}^{d_2}$, which takes in a vector $x$ that is often the vector-representation of a picture. In the context of this review, the output $f(x)$ is a discrete distribution vector, i.e. the $k$th element $f_k(x)\in\left[0,1\right] $ denotes the probability of $x$ belonging to class $k$.
+
+In a common explanation, the construction of $f$ can be written as follows.
+
+The input vector, or picture, $x$, is first separated to $P$ \emph{patches}, which can be written as a function $z_p(x)\in\mathbb{R}^{d_1},1\leq p\leq P$.
+
+Then, each patch is transformed to $r$ scalars, which can be written as $h_j(z_p)=\sigma(w_j^Tz_p),1\leq j\leq r$, where $w_j\in\mathbb{R}^{d_1}$, $\sigma:\mathbb{R}\rightarrow\mathbb{R}$ is in general a non-linear function. Each $h_j$ is known as a \emph{filter}.
+
+Now we have $P\times r$ scalars. These scalars are finally summed together with weights, denoting as $\alpha_{k,j,p}$. The two-layer CNN can then be written as
+\[f_k(x):=\sum_{j=1}^{r}\sum_{p=1}^{P}\alpha_{k,j,p}h_j(z_p(x)).\]
+When $\sigma$ is identity, i.e. $\sigma(x)=x,x\in\mathbb{R}$, we can separate the trainable parameters $\alpha,w$ with other constants. Rewritten $f_k$ as
+\begin{align*}
+f_k(x)&=\sum_{j=1}^{r}\sum_{p=1}^{P}\alpha_{k,j,p}h_j(z_p(x))\\
+&=\sum_{j=1}^{r}\sum_{p=1}^{P}\alpha_{k,j,p}w_j^Tz_p(x)\\
+&=\sum_{j=1}^{r}\alpha_{k,j}^TZw_j\\
+&=\sum_{j=1}^{r}\text{tr}(\alpha_{k,j}^TZw_j)\\
+&=\sum_{j=1}^{r}\text{tr}(Zw_j\alpha_{k,j}^T)\\
+&=\text{tr}(Z\sum_{j=1}^{r}w_j\alpha_{k,j}^T)\\
+&=\text{tr}(ZA_k)
+\end{align*}
+where in the second equation $Z=(z_1(x),\cdots,z_P(x))^T$, in the third equation $\alpha_{k,j}=(\alpha_{k,j,1},\cdots,\alpha_{k,j,P})^T$ and in the final equation $A_k=\sum_{j=1}^{r}w_j\alpha_{k,j}^T$.
+
+Thus, let $A:=(A_1(x),\cdots,A_{d_2}(x))$ denoting all $A_k$, so $A$ is in fact all the trainable parameters. We can then define a function \[f^A:=(\text{tr}(ZA_1),\cdots,\text{tr}(ZA_{d_2})),\] which is a linear function corresponding to $A$.
+
+The CNN model class is a collection of such functions with constraints on $A$. In particular, we define
+\[\mathcal{F_{\text{CNN}}}(B_1,B_2):=\lbrace f^A|\max_{j\in[r]}\|w_j\|_2\leq B_1, \max_{k\in[d_2],j\in[r]}\|\alpha_{k,j}\|_2\leq B_2,\text{rank}(A)=r \rbrace\]
+where $[x]=\lbrace i|1\leq i\leq x\rbrace.$
+
+So $\mathcal{F}(B_1,B_2)$ includes all such functions with a limited trainable parameters, and the rank constraint inherits from the formulation of $A_k$. Now, the matrix $A$ can be decomposed as $A=UV^T$, where both $U$ and $V$ have $r$ columns. The column space of $A$ contains the convolution parameters $\lbrace w_j\rbrace$, and the row space of $A$ contains the output parameters $\lbrace\alpha_{k,j}\rbrace$.
+
+Now, the matrices $A$ satisfying the constraints in $\mathcal{F}$ in fact form a non-convex 	set. To make it convex, a standard relaxation is based on the nuclear norm $\|A\|_*$ which is the sum of the singular values of $A$. By the triangle inequality we have
+\begin{align*}
+\|A\|_*&=\|(A_1,\cdots,A_P)\|_*\\
+&\leq\sum_{j=1}^r\|w_j(\alpha_{1,j}^T,\cdots,\alpha_{d_2,j}^T)\|_*\\
+&\leq\sum_{j=1}^r\|w_j\|\|(\alpha_{1,j}^T,\cdots,\alpha_{d_2,j}^T)\|_*\\
+&\leq rB_1\sqrt{d_2B_2^2}\\
+&=r\sqrt{d_2}B_1B_2.
+\end{align*}
+Thus, we can define a more general CCNN class by
+\[\mathcal{F}_{\text{CCNN}}:=\lbrace f^A|\|A\|_*\leq r\sqrt{d_2}B_1B_2\rbrace,\]
+which is convex and we have $\mathcal{F}_{\text{CCNN}}\supseteq\mathcal{F}_{\text{CNN}}$.
+
+Now, let $\mathcal{L}(f(x),y)$ denote the loss function, where $y$ is the label of $x$. We assume $\mathcal{L}$ is convex and $L$-Lipschitz in the first argument. Our aim is then compute
+\[\widehat{f}_{CCNN}:=\text{argmin}_{f^A\in\mathcal{F}_{\text{CCNN}}}\sum_{i=1}^n\mathcal{L}(f^A(x_i);y_i).\]
+
+When $\sigma$ is a non-linear function, we transform the filter $h_{\sigma,w}(z_p(x))$ to a linear form by
+\[h(z_p(x_i))=\sum_{(i',p')\in[n]\times[P]}c_{i',p'}k(z_p(x_i),z_{p'}(x_{i'})),\]
+where $k$ is a positive semi-definite kernel function. Viewing \[k(*,z_{p'}(x_{i'})),(i',p')\in[n]\times[P]\] as a basis, the filter $h$ is represented by $c_{i',p'}$. Now, let $K\in\mathbb{R}^{nP\times nP}$,
+\[K_{(i,p),(i',p')}=k(z_p(x_i),z_{p'}(x_{i'})).\]
+Consider a factorization $K=QQ^T$, where $Q\in\mathbb{R}^{nP\times m}$, we can rewrite $h$ by 
+\[h(z_p(x_i))=c^T(Q_{(i,p)}Q^T)^T=\langle Q_{(i,p)},c^TQ\rangle.\]
+Let $w=c^TQ$, we have $h(z_p(x_i))=\langle Q_{(i,p)},w\rangle$. In order to learn the filter $h$, it suffices to learn $w$. The non-linear $h$ is thus transformed to a linear function(of $w$).\\
+Now, as in the linear case but denoting $Q$ as $Z$, we have
+\begin{align*}
+f_k(x)&=\sum_{j=1}^{r}\sum_{p=1}^{P}\alpha_{k,j,p}h_j(z_p(x))\\
+&=\text{tr}(QA_k)\\
+&=\text{tr}(ZA_k).
+\end{align*}
+Suppose we have computed a result $A\in\mathbb{R}^{m\times Pd_2}$. At test time, given a new input $x\in\mathbb{R}^{d_0}$, we can compute the matrix $Z$ as follows.
+
+Notice that the the $(i,p)$th row of $K$ corresponding to $z_p(x_i)$, denoted as $K_{(i,p)}$, is $K_{(i,p)}=Q_{(i,p)}Q^T$. Let $v(z_p(x))=(k(z_p(x),z_{p'}(x_{i'})))_{(i',p')}\in\mathbb{R}^{nP}$, we want to find the representation $c_x$ so that
+\[c_x=\text{argmin}_{c_x}\|v(z_p(x))^T-c_x^TQ^T\|_2^2=\|v(z_p(x))-Qc_x\|_2^2.\]
+The answer is $c_x=Q^\dagger v_p(x)$, where $v_p(x)=v(z_p(x))$. So we have $Z(x)=(Q^\dagger v(x))^T$.
+
+\begin{algorithm}
+\caption{Learning Two-layer Convexified Convolutional Neural Networks}\label{euclid}
+\algorithmicrequire{ Data $\lbrace(x_i,y_i)\rbrace_{i=1}^n$, kernel function $\mathcal{K	}$, regularization parameter $R>0$, number of filters $r$.}
+\begin{enumerate}
+\item Construct a kernel matrix $K\in\mathbb{R}^{nP\times nP}$ such that the entry at column $(i,p)$ is and row $(i',p')$ is equal to $\mathcal{K}(z_p(x_i),z_{p'}(x_{i'}))$.
+\item Compute a factorization $K=QQ^T$ or an approximation  $K\approx QQ^T$, where $Q\in\mathcal{R}^{nP\times m}$.
+\item For each $x_i$, construct patch matrix $Z(x_i)=(Q^\dagger v(x_i))^T\in\mathbb{R}^{P\times m}$
+\item Solve the following optimization problem to obtain a matrix $\widehat{A}=(\widehat{A}_1,\cdots,\widehat{A}_{d_2})$:
+\[\widehat{A}\in\text{argmin}_{\|A\|_*\leq R}\tilde{\mathcal{L}}(A):=\sum_{i=1}^m\mathcal{L}(\text{tr}(Z(x_i)A),\cdots,\text{tr}(Z(x_i)A_{d_2});y_i).\]
+\item Compute a rank-$r$ approximation $\tilde{A}\approx\widehat{U}\widehat{V}^T$ where $\widehat{U}\in\mathbb{R}^{m\times r}$ and $\widehat{V}\in\mathbb{R}^{Pd_2\times r}$.
+\end{enumerate}
+\algorithmicensure{ Return the predictor $\widehat{f}_{\text{CCNN}}(x):=(\text{tr}(Z(x)\widehat{A}_1),\cdots,\text{tr}(Z(x)\widehat{A}_{d_2}))$ and the convolutional layer output $H(x):=\widehat{U}^T(Z(x))^T$.}
+\end{algorithm}
+
+
+\bibliography{report_xdj.bib}
+\end{document}

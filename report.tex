@@ -6,10 +6,9 @@
 \usepackage{amssymb}
 \usepackage{hyperref}
 \usepackage{algorithm}
-\usepackage[noend]{algpseudocode}
-\makeatletter
-\def\BState{\State\hskip-\ALG@thistlm}
-\makeatother
+\usepackage{algorithmic}
+
+\usepackage{mathrsfs}
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
@@ -17,8 +16,8 @@
 \usepackage{cite}
 \bibliographystyle{plain}
 
-\title{Report of Project 1\\A Review of Convexified Convolutional Neural Network}
-\author{Xiaodong Jia}
+\title{Report of Project 1\\A Review of Convexified Neural Network}
+\author{Xiaodong Jia 1601110031\\Jianhao Shen}
 
 \begin{document}
 \maketitle
@@ -27,11 +26,20 @@
 \newpage
 
 \section{Introduction}
-In this review, we analyze a two layer convexified convolutional neural network(CCNN) based on \cite{zhang2016convexified}, make a review of the related works and use some new methods to solve this problem.
-\section{A Brief Summary of the Main Ideas}
+In this article, we review the effort people made to convexify a neural network(NN), in both deep NNs(DNNs) and convolutional NNs(CNNs).
+
+We know that a classical NN as a function is not convex in general, which is known to be NP-hard to solve by the standard approach like stochastic gradient method(SGD). What's more, it has two drawbacks. First, the rate of convergence of SGD can be slow due to the nonconvexity. Second, its statistical properties are very difficult to understandd, as the actual performance is determined by some combination of the CNN architecture along with the optimization algorithm.
+
+We thus find it really interesting to make a CNN convex and address the two drawbacks above. However, as we will see, the convexification of NNs uses relaxation methods, which tranform the original trainable parameters to other relaxed variables in a much larger domain. As a result, the space consuming will soon become unacceptable with the increase of the number of layers, and even a two-layer CNN problem requires much more resource than a classical method.
+
+A brief summary of the related works are as follows. The first work can be traced back to \cite{bengio2006convex} in 2006, which gave theotical properties of convexification. Then,  a constructional reformulation of a general two-layer model was put forward in \cite{aslan2013convex} in 2013. After one year, the convexification of a multi-layer DNN was shown in \cite{aslan2014convex}. In 2016, \cite{zhang2016convexified} gave a two-layer convexified CNN(called CCNN in their article).
+
 The work in \cite{zhang2016convexified} is mainly about convexifying a two-layer convolutional neural network. Before it there is the convexification of a multi-layer deep neural network(DNN) in \cite{aslan2014convex}, earlier than which is a more generalized two layer modeling in \cite{aslan2013convex}.
 
-There are many advantages of a convex problem, like we won't stack at a local minimum. However, With the increase of layer number, the scale of both problems soon become not affordable, and even a two-layer CNN problem requires much more resource than a classical method.
+\section{A Brief Summary of the Main Ideas}
+\subsection{Convex Neural Networks}
+The work in \cite{bengio2006convex} shows that training an NN can be viewed as a convex optimization problem, but with infinite hidden units. By choosing a regularizer that promotes sparse solutions(e.g. $L^{1}$ regularizetion), 
+the solution will have a finite number of \emph{active} hidden units, but the problem still consists of a large number of variables. An effective approach to this problem is to add one hidden unit at a time and stop once the global optimum is reached so that not all possible hidden units are visited.
 \subsection{Convex DNNs}
 As a common definition, an $n$-layer DNN can be written as \[f(x)=l_n\circ\cdots\circ l_2\circ l_1(x),\] where $l_i=A_i(w_i^Tx+b_i),i\in\left\lbrace 1,\cdots,n\right\rbrace $ with $A_i$ non-linear, often called an activation function. We will omit the bias term $b_i$ for simplicity. We also have a loss function $L(f(x);y)$ to measure the accuracy of the DNN, where $y$ is the label of $x$. Our aim is then to compute the $w$ such that
 \[w=\text{argmin}_{w}\sum_{x}L(f(x);y(x)).\]
@@ -51,7 +59,101 @@ If the loss function $\mathcal{L}(f;y)$ is convex about $f$, $\mathcal{L}(f^A(Z)
 \begin{align*}
 \widehat{A}\in\text{argmin}_{\|A\|_*\leq R}\tilde{\mathcal{L}}(A)
 \end{align*}
-where $\tilde{\mathcal{L}}(A)=\sum_{i=1}^n\mathcal{L}(f^A(x_n);y_n)$, $n$ is the size of mini-batch, $\|\cdot\|_*$ denotes the nuclear norm, and $R$ is a restriction. $\widehat{A}$ is then transformed to the corresponding parameters of the CNN. As a result, the original non-convex problem is tranformed to a convex one. 
+where $\tilde{\mathcal{L}}(A)=\sum_{i=1}^n\mathcal{L}(f^A(x_n);y_n)$, $n$ is the size of mini-batch, $\|\cdot\|_*$ denotes the nuclear norm, and $R$ is a restriction. $\widehat{A}$ is then transformed to the corresponding parameters of the CNN. As a result, the original non-convex problem is tranformed to a convex one.
+\section{Convex NN}
+Neural Network(NN) is a function of the form $\hat{y}(x) = \sum_{i=1}^{m} w_{i} h_{i}(x)$ where $x$ is an input vector, $h_{i}(x)$ are hidden units and $w_{i}$ are weight values. Hidden units are obtained from a linear discriminant function: $h_{i}(x) = s(v_{i}x+b_{i})$ where $s(a)$ is an nonlinear function, e.g. $s(a) = tanh(a)$ or $s(a) = \frac{1}{1+e^{-a}}$. A loss function $Q(y,\hat{y})$ is introduced to measure the mismatches between the prediction $\hat{y}(x_{i})$ and the observed y. A regularizer $\Omega(w)$ is introduced to favor smaller parameters, e.g. a $L^{1}$ regularizer promotes sparse solutions. With notations above, we want to solve the optimization problem:
+\begin{equation}
+\min_{m,w,v} \Omega(w) + \sum_{i=1}^{n}Q(y_{i},\hat{y_{i}}(x_{i})) 
+\end{equation}
+where \{$(x_{i},y_{i})$\} is the observed data set. 
+
+This problem is not convex, even if $\Omega(w)$ and $Q(y,\hat{y})$ are convex, since the hidden units $h_{i}(x) = s(v_{i}x+b)$ is not convex w.r.t. $v_{i}$ because of the nonlinear function s(a). Notice that the non-convexity only lies in $v_{i}$ which determine the chosen hidden units, the problem can be converted into a convex one by including all hidden units in our NN and only tuning $w_{i}$ to determine both chosen hidden units and weight values(i.e., a hidden unit is chosen iff the corresponding weight value is nonzero). More specifically, we define the ``infinite"" NN:
+\newtheorem{defn}{Definition}[section]
+\begin{defn}
+	Let $\mathcal{H}$ be a set of functions from an input space $\mathcal{X}$ to $\mathbb{R}$. Elements of $\mathcal{H}$ can be understood as ``hidden units" in a NN. Let $\mathcal{W}$ be the Hilbert space of functions from $\mathcal{H}$ to $\mathbb{R}$, with an inner product denoted by a $\cdot$ b for a, b $\in \mathcal{W}$. An element of $\mathcal{W}$ can be understood as the output weights vector in a NN. Let $h(x):\mathcal{H}\rightarrow \mathbb{R}$ the function that maps any element $h_{i}$ of $\mathcal{H}$ to $h_{i}(x)$. $h(x)$ can be understood as the vector of activations of hidden units when input x is observed. Let $w \in \mathcal{W}$ represent a parameter(the output weights). The NN prediction is denoted $\hat{y}(x)= w\cdot h(x)$. Let $Q:\mathbb{R}\times \mathbb{R} \rightarrow \mathbb{R}$ be a cost function convex in its second argument that takes a scalar target value y and a scalar prediction $\hat{y}(x)$ and returns a scalar cost. This is the cost to be minimized on example pair (x, y). Let $D = \{ (x_{i},y_{i}:1\le i \le n)\}$ a training set.Let $\Omega : \mathcal{W} \rightarrow \mathbb{R}$ be a convex regularization function that penalizes for the choice of more ``complex" parameters. We define the convex NN criterion $C(\mathcal{H}, Q, \Omega, D, w)$ with parameter $w$ as follows:
+	\begin{equation}
+	C(\mathcal{H}, Q, \Omega, D, w) = \Omega(w) + \sum_{t=1}^{n}Q(y_{t}, w \cdot h(x_{t}))
+	\end{equation}
+\end{defn}
+
+It is easy to see that the convex NN cost $C(\mathcal{H}, Q, \Omega, D, w)$ is a convex function of $w$, but has infinite hidden units, which cannot be trained. However, with regularizer that promotes sparse solutions like $L^{1}$ regularizer, it can be proved that the solution has finite hidden units. We show the special case with $Q(y,\hat{y}) = max(0, 1-y\hat{y})$ and $L^{1}$ regularization, and the training criterion is 
+\begin{equation}
+C(w) = K\lVert w \rVert_{1} + \sum_{t=1}^{n}max(0, 1-y_{t}w\cdot h(x_{t}))
+\end{equation}
+We can rewrite this cost function as:
+\begin{equation}
+\min_{w, \xi} K \lVert w \rVert_{1} + \sum_{t=1}^{n} \xi_{t}
+\end{equation}
+such that
+\begin{gather}
+y_{t}[w\cdot h(x_{t})] \ge 1 - \xi_{t}\\
+\xi_{t} \ge 0, t=1,...,n
+\end{gather}
+Then we derive the dual problem (P):
+\begin{equation}
+\max_{\lambda} \sum_{t=1}^{n} \lambda_{t}
+\end{equation}
+such that
+\begin{gather}
+\lambda \cdot Z_{i} - K \le 0, i \in I\\
+\lambda_{t} \le 1, t=1,...,n
+\end{gather}
+where $(Z_{i})_{t}= y_{t}h_{i}(x_{t})$,and I is the index set of hidden units. Such a problem follows Theorem 4.2 from (Hettich and Kortanek, 1993), and the following theorem holds:
+\newtheorem{tem}{Theorem}[section]
+\begin{tem}
+	The solution of (P) can be attained with constraints $C_{2}^{'}$ and only $n + 1$ constraints $C_{1}^{'}$(i.e., there exists a subset of n+1 constraints $C_{1}^{'}$ giving rise to the same maximum
+	as when using the whole set of constraints). Therefore, the primal problem associated is the
+	minimization of the cost function of a NN with n + 1 hidden neurons.
+\end{tem}
+This convex NN can be optimized by a stepwise algorithm, which is shown as follows:
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\begin{algorithm}[htb]
+	\caption{Convex(NN)}
+	\begin{algorithmic}[1]
+		\REQUIRE
+		training set $D = \{ (x_{1},y{1}),...,(x_{n},y_{n})\}$, convex loss function $Q$, and scalar regularization penalty $\lambda$.s is either the $sign$ function or the $tanh$ function.
+		\STATE Set $v_{1} = (0,0,...,1)$ and select $w_{1} = argmin_{w_{1}} \sum_{t} Q(y_{t},w_{1}s(1))+\lambda \lvert w_{1} \rvert$
+		\STATE Set $i = 2$
+		\WHILE{True}
+		\STATE Let $q_{t} = Q^{'}(y_{t},\sum_{j=1}^{i-1} w_{j}h_{j}(x_t))$
+		\IF{s=$sign$}
+		\STATE train linear classifier $h_{i}(x) = sign(v_{i}\cdot \tilde{x})$ with examples $\{(x_{t}, sign(q_{t}))\}$ and errors weighted by $\lvert q_{t} \rvert, t=1,...,n$.(i.e., $maximize \sum_{t} q_{t}h_{i}(x_{t})$)
+		\ELSIF{s=$tanh$}
+		\STATE train linear classifier $h_{i}(x) = tanh(v_{i}\cdot \tilde{x})$ to $maximize \sum_{t} q_{t}h_{i}(x_{t})$
+		\ENDIF
+		\IF{$\sum_{t} q_{t}h_{i}(x_{t})\le \lambda$}
+		\STATE stop
+		\ENDIF
+		\STATE select $w_{1},...,w_{i}$(and optimally $v_{2},...,v_{i}$) minimizing (exactly or approximally) $C = \sum_{t}Q(y_{t},\sum_{j=1}^{i} w_{j}h_{j}(x_{t})) + \lambda \sum_{j}\lvert w_{j} \rvert$ such that 
+		$\frac{\partial C}{\partial w_{j}} = 0$ for $j=1,...,i$
+		\STATE Return the predictor $\hat{y}(x) = \sum_{j=1}^{i} w_{j}h_{j}(x)$
+		\ENDWHILE
+	\end{algorithmic}
+\end{algorithm}
+
+And it has been proved that Alogrithm convex NN stops when it reaches the global optimum of $C(w)$. However, finding a linear classifier that minimize the weighted sum of classfication errors is an NP-hard problem, which can only be solved  efficiently when the input dimension is low. For high dimension input, we can implement approximate minimization, which turns out to perform well in practice.
+
+In another paper \cite{oseledets2009breaking}, the author gives a detailed analysis of generalization bound of different prediction functions, which is listed below:
+\begin{table}[htb]
+	\begin{tabular}{|c|c|c|}
+		\hline
+		Model & Function form & Generalization bound\\
+		\hline
+		No assumption & & $n^{-1/(d+3)}log n$\\
+		\hline
+		Affine function & $w^\top x + b$ & $d^{1/2}\cdot n^{-1/2}$\\
+		\hline
+		Generalized additive model & $\sum_{j=1}^{k}f_{j}(w_{j}^\top x),w_{j}\in \mathbb{R}^{d}$ & $k d^{1/2}\cdot n^{-1/4}log n$\\
+		\hline
+		Single-layer neural network & $\sum_{j=1}^{k} \mu_{j} (w_{j}^\top x + b_{j})_{+}$ & $k d^{1/2} \cdot n^{-1/2}$\\
+		\hline
+		Projection pursuit & $\sum_{j=1}^{k} f_{j}(w_{j}^\top x), w_{j} \in \mathbb{R}^{d}$ & $k d^{1/2}\cdot n^{-1/4}log n$\\
+		\hline
+		Dependence on subspace & $f(W^\top x), W \in \mathbb{R}^{d \times s}$ & $d^{1/2}\cdot n^{-1/(s+3)}log n$\\
+		\hline
+	\end{tabular}
+	\caption{Summary of generalization bounds for various models.}
+\end{table}
 \section{The Construction of A Three-layer DNN}
 As mentioned, the problem we want to solve is 
 \begin{equation}\label{dnn}
@@ -206,7 +308,7 @@ Notice that the the $(i,p)$th row of $K$ corresponding to $z_p(x_i)$, denoted as
 The answer is $c_x=Q^\dagger v_p(x)$, where $v_p(x)=v(z_p(x))$. So we have $Z(x)=(Q^\dagger v(x))^T$.
 
 \begin{algorithm}
-\caption{Learning Two-layer Convexified Convolutional Neural Networks}\label{euclid}
+\caption{Learning Two-layer Convexified Convolutional Neural Networks}
 \algorithmicrequire{ Data $\lbrace(x_i,y_i)\rbrace_{i=1}^n$, kernel function $\mathcal{K	}$, regularization parameter $R>0$, number of filters $r$.}
 \begin{enumerate}
 \item Construct a kernel matrix $K\in\mathbb{R}^{nP\times nP}$ such that the entry at column $(i,p)$ is and row $(i',p')$ is equal to $\mathcal{K}(z_p(x_i),z_{p'}(x_{i'}))$.
@@ -218,7 +320,18 @@ The answer is $c_x=Q^\dagger v_p(x)$, where $v_p(x)=v(z_p(x))$. So we have $Z(x)
 \end{enumerate}
 \algorithmicensure{ Return the predictor $\widehat{f}_{\text{CCNN}}(x):=(\text{tr}(Z(x)\widehat{A}_1),\cdots,\text{tr}(Z(x)\widehat{A}_{d_2}))$ and the convolutional layer output $H(x):=\widehat{U}^T(Z(x))^T$.}
 \end{algorithm}
+\section{Numerical Results}
+The source code of CCNN is available at \href{https://github.com/zhangyuc/CCNN}{CCNN on GitHub}, which implements the CCNN applied to MNIST and Cifar-10 dataset. 
 
+As noted in the homepage, the current CCNN implementation caches all feature vectors in the memory, which results in a high memory requirement (about 10GB for the mnist datasets, about 50GB for the cifar10 dataset). What's more, the whole process for Cifar-10 takes about $1.5$ hours but it doesn't make use of GPU, which will hopefully accelerate the process. 
 
-\bibliography{report_xdj.bib}
+The Cifar-10 program reaches an accuracy of $94.92\%$ on the training dataset, while MNIST $96.75\%$. 
+
+The Cifar-10 program reaches an accuracy of $79.25\%$ on the testing dataset, while MNIST $69.62\%$. 
+
+One can see that althogh the training data reaches a good point, CCNN shows poor robust on the testing dataset.
+\section{Summary}
+In this report, we reviewed several important convexification methods in recent years, which require tricky reformularization of the original problems, and introduce large space requirement. In particular, the performance of CCNNs is not as well as a traditional method in both time consuming and robust. Further research could be conduct on how to increase the robust of CCNNs and how to reduce the space cost.
+
+\bibliography{report.bib}
 \end{document}

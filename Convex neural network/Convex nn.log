@@ -1,14 +1,14 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/W32TeX) (preloaded format=pdflatex 2017.4.8)  11 JUN 2017 13:36
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.6.12)  13 JUN 2017 15:47
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**"./Convex nn.tex"
+**"Convex nn.tex"
 (./Convex nn.tex
-LaTeX2e <2017/01/01> patch level 3
-Babel <3.9r> and hyphenation patterns for 83 language(s) loaded.
-(d:/texlive/2016/texmf-dist/tex/latex/base/article.cls
+LaTeX2e <2017-04-15>
+Babel <3.10> and hyphenation patterns for 84 language(s) loaded.
+(/usr/local/texlive/2017/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
-(d:/texlive/2016/texmf-dist/tex/latex/base/size10.clo
+(/usr/local/texlive/2017/texmf-dist/tex/latex/base/size10.clo
 File: size10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
 )
 \c@part=\count79
@@ -23,24 +23,24 @@ File: size10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
 )
-(d:/texlive/2016/texmf-dist/tex/latex/amsmath/amsmath.sty
+(/usr/local/texlive/2017/texmf-dist/tex/latex/amsmath/amsmath.sty
 Package: amsmath 2016/11/05 v2.16a AMS math features
 \@mathmargin=\skip43
 
 For additional information on amsmath, use the `?' option.
-(d:/texlive/2016/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2017/texmf-dist/tex/latex/amsmath/amstext.sty
 Package: amstext 2000/06/29 v2.01 AMS text
 
-(d:/texlive/2016/texmf-dist/tex/latex/amsmath/amsgen.sty
+(/usr/local/texlive/2017/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks14
 \ex@=\dimen103
 ))
-(d:/texlive/2016/texmf-dist/tex/latex/amsmath/amsbsy.sty
+(/usr/local/texlive/2017/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
 \pmbraise@=\dimen104
 )
-(d:/texlive/2016/texmf-dist/tex/latex/amsmath/amsopn.sty
+(/usr/local/texlive/2017/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 2016/03/08 v2.02 operator names
 )
 \inf@bad=\count87
@@ -81,25 +81,25 @@ LaTeX Font Info:    Redeclaring font encoding OMS on input line 713.
 LaTeX Info: Redefining \[ on input line 2817.
 LaTeX Info: Redefining \] on input line 2818.
 )
-(d:/texlive/2016/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+(/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/amsfonts.sty
 Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 \symAMSa=\mathgroup4
 \symAMSb=\mathgroup5
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
 )
-(d:/texlive/2016/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
 )
-(d:/texlive/2016/texmf-dist/tex/latex/jknapltx/mathrsfs.sty
+(/usr/local/texlive/2017/texmf-dist/tex/latex/jknapltx/mathrsfs.sty
 Package: mathrsfs 1996/01/01 Math RSFS package v1.0 (jk)
 \symrsfs=\mathgroup6
 )
-(d:/texlive/2016/texmf-dist/tex/latex/algorithms/algorithm.sty
+(/usr/local/texlive/2017/texmf-dist/tex/latex/algorithms/algorithm.sty
 Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
 nment
 
-(d:/texlive/2016/texmf-dist/tex/latex/float/float.sty
+(/usr/local/texlive/2017/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \c@float@type=\count99
 \float@exts=\toks19
@@ -107,16 +107,16 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \@float@everytoks=\toks20
 \@floatcapt=\box29
 )
-(d:/texlive/2016/texmf-dist/tex/latex/base/ifthen.sty
+(/usr/local/texlive/2017/texmf-dist/tex/latex/base/ifthen.sty
 Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
 )
 \@float@every@algorithm=\toks21
 \c@algorithm=\count100
 )
-(d:/texlive/2016/texmf-dist/tex/latex/algorithms/algorithmic.sty
+(/usr/local/texlive/2017/texmf-dist/tex/latex/algorithms/algorithmic.sty
 Package: algorithmic 2009/08/24 v0.1 Document Style `algorithmic'
 
-(d:/texlive/2016/texmf-dist/tex/latex/graphics/keyval.sty
+(/usr/local/texlive/2017/texmf-dist/tex/latex/graphics/keyval.sty
 Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
 \KV@toks@=\toks22
 )
@@ -126,7 +126,8 @@ Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
 \c@ALC@depth=\count104
 \ALC@tlm=\skip46
 \algorithmicindent=\skip47
-) (./Convex nn.aux)
+)
+(./Convex nn.aux)
 \openout1 = `"Convex nn.aux"'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 12.
@@ -143,22 +144,22 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 12.
 LaTeX Font Info:    ... okay on input line 12.
 LaTeX Font Info:    Try loading font information for U+msa on input line 13.
 
-(d:/texlive/2016/texmf-dist/tex/latex/amsfonts/umsa.fd
+(/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
 LaTeX Font Info:    Try loading font information for U+msb on input line 13.
 
-(d:/texlive/2016/texmf-dist/tex/latex/amsfonts/umsb.fd
+(/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Try loading font information for U+rsfs on input line 13.
 
-(d:/texlive/2016/texmf-dist/tex/latex/jknapltx/ursfs.fd
+(/usr/local/texlive/2017/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 22.
 
-(d:/texlive/2016/texmf-dist/tex/latex/base/omscmr.fd
+(/usr/local/texlive/2017/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
@@ -166,7 +167,7 @@ LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
 \c@defn=\count105
  [1
 
-{d:/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 \c@tem=\count106
  [2]
 Overfull \hbox (7.79414pt too wide) in paragraph at lines 92--109
@@ -175,30 +176,32 @@ Overfull \hbox (7.79414pt too wide) in paragraph at lines 92--109
 
 [3] [4] (./Convex nn.aux) ) 
 Here is how much of TeX's memory you used:
- 1503 strings out of 493013
- 17360 string characters out of 6136994
- 80171 words of memory out of 5000000
- 5052 multiletter control sequences out of 15000+600000
+ 1503 strings out of 492995
+ 17703 string characters out of 6132704
+ 80597 words of memory out of 5000000
+ 5061 multiletter control sequences out of 15000+600000
  12531 words of font info for 51 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 27i,10n,24p,1349b,498s stack positions out of 5000i,500n,10000p,200000b,80000s
-<d:/texlive/2016/texmf-dist/fonts/type1/public/amsfo
-nts/cm/cmbx10.pfb><d:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-bx12.pfb><d:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb>
-<d:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><d:/texli
-ve/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb><d:/texlive/2016/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb><d:/texlive/2016/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmr10.pfb><d:/texlive/2016/texmf-dist/fonts/type1
-/public/amsfonts/cm/cmr12.pfb><d:/texlive/2016/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmr17.pfb><d:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmr5.pfb><d:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb><d
-:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><d:/texlive/2
-016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><d:/texlive/2016/texmf
--dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb><d:/texlive/2016/texmf-dist/font
-s/type1/public/amsfonts/cm/cmsy7.pfb><d:/texlive/2016/texmf-dist/fonts/type1/pu
-blic/amsfonts/cm/cmti10.pfb><d:/texlive/2016/texmf-dist/fonts/type1/public/amsf
-onts/symbols/msbm10.pfb>
-Output written on "Convex nn.pdf" (4 pages, 186066 bytes).
+ 27i,10n,24p,1347b,498s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2017/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmex10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmmi10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmmi5.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/ams
+fonts/cm/cmmi7.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmr10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfont
+s/cm/cmr12.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmr17.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmr5.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+r7.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.
+pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.p
+fb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb
+></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb><
+/usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></
+usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pf
+b>
+Output written on "Convex nn.pdf" (4 pages, 186258 bytes).
 PDF statistics:
  85 PDF objects out of 1000 (max. 8388607)
  61 compressed objects within 1 object stream
