@@ -1,0 +1,20 @@
+\begin{thebibliography}{1}
+
+\bibitem{aslan2013convex}
+{\"O}zlem Aslan, Hao Cheng, Xinhua Zhang, and Dale Schuurmans.
+\newblock Convex two-layer modeling.
+\newblock In {\em Advances in Neural Information Processing Systems}, pages
+  2985--2993, 2013.
+
+\bibitem{aslan2014convex}
+{\"O}zlem Aslan, Xinhua Zhang, and Dale Schuurmans.
+\newblock Convex deep learning via normalized kernels.
+\newblock In {\em Advances in Neural Information Processing Systems}, pages
+  3275--3283, 2014.
+
+\bibitem{zhang2016convexified}
+Yuchen Zhang, Percy Liang, and Martin~J Wainwright.
+\newblock Convexified convolutional neural networks.
+\newblock {\em arXiv preprint arXiv:1609.01000}, 2016.
+
+\end{thebibliography}

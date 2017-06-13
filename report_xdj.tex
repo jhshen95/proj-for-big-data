@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{amsmath}
 \DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\rank}{rank}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{hyperref}
@@ -56,7 +57,7 @@ As mentioned, the problem we want to solve is
 \begin{equation}\label{dnn}
 \min_{W,U,V,\Phi,\Theta}L_1(WX,\Phi)+\frac{1}{2}\|W\|^2+L_2(U\Phi,\Theta)+\frac{1}{2}\|U\|^2+L_3(V\Theta,Y)+\frac{1}{2}\|V\|^2.
 \end{equation}
-\eqref{dnn} is convex in $U,V,W$ given $\Phi,\Theta$, but not jointly convex in all of them, due to the interaction between $U,V,W$ and $\Phi,\Theta$. To tackle this problem, consider the part of \eqref{dnn} corresponding to the second layer,
+\eqref{dnn} is convex in $U,V,W$ given $\Phi,\Theta$, but not jointly convex in all of them, due to the interaction between $U,V,W$ and $\Phi,\Theta$. To tackle this problem, \cite{aslan2013convex} consider the part of \eqref{dnn} corresponding to the second layer,
 \begin{equation}\label{dnn2}
 	\min_U L(U\Phi,\Theta)+\frac{1}{2}\|U\|^2.
 \end{equation}
@@ -75,14 +76,69 @@ The another problem is that $\Phi$ and $\Theta$ serve as the input and output fo
 The postulate may seem strange but it has backgrounds. The term $\Theta'Z$ is called a \emph{propensity matrix} and $\Theta'\Theta$ is called an unnormalized \emph{output kernel}, so now the loss function depends only on them. 
 
 Using Postulate 1 and $Z=U\Phi$, \eqref{dnn2} can be rewritten as $L^u(\Phi'U\Phi,\Theta'\Theta)+\frac{1}{2}\|U\|^2$. Now, denote $N:=\Theta'\Theta$ and $S:=\Theta'Z=\Theta'U\Phi$(hence $S\in\Theta'\mathbb{R}\Phi=N\mathbb{R}K$), \eqref{dnn2} can be rewritten as
-\[\min_SL^u(S,N)+\frac{1}{2}\tr(K^\dagger S'N^\dagger S).\]
+\begin{equation}\label{dnn4}
+\min_SL^u(S,N)+\frac{1}{2}\tr(K^\dagger S'N^\dagger S).
+\end{equation}
 This objective is jointly convex in the propensity matrix $S$ and output kernel $N$. Notice that $N$ is positive semidefinite. Thus, to make \eqref{dnn2} convex, the final postulate should require the domain of $N$ to be convex.
 
 \textbf{Postulate 2.} The domain of $N=\Phi'\Phi$ can be relaxed to a convex set preserving sufficient structure.
 
 There is an relaxation approach in \cite{aslan2013convex}, which is only applicable for a single hidden layer network. A more generalized approach in \cite{aslan2014convex} is as follows.
 
+Let's reconsider \eqref{dnn2}. This time we change the form of it to 
+\begin{equation}\label{dnn5}
+	\min_UL(U\Phi,\Theta)+\frac{1}{2}\|\Theta'U\|^2.
+\end{equation}
+One can see we only change the regularization term $\|U\|^2$ to $\|Theta'U\|$. A key fact is that $U$ still satisfy the representer theorem under this change, so we have $U=(\Theta\Theta')^\dagger A\Phi'$ for some $A$. Generally speaking, $\Theta$ has full row rank, so we can use a change of variables $A=\Theta B$, and our regularization becomes \[\|\Theta'U\|^2=\|\Theta'(\Theta\Theta')^\dagger A\Phi'\|^2=\|\Theta'(\Theta\Theta')^\dagger\Theta B\Phi'\|^2.\]
+Now, we define $M:=\Theta'(\Theta\Theta')^\dagger\Theta$ to be the \emph{normalized output kernel}. The term $(\Theta\Theta')^\dagger$ essentially normalizes the spectrum of the kernel $\Theta'\Theta$, and, since $M^2=M$, we must have the eigenvalues of $M$, $\lambda_{M}=\left\lbrace 0,1\right\rbrace$. Finally, the regularization term can be rewritten as
+\[\|MB\Phi'\|^2=\tr(MBKB'M)=\tr(MBKK^\dagger KB'M)=\tr(SK^\dagger S'),\]
+where $S=MBK$. Another important fact is that we have 
+\[S=MBK=\Theta'(\Theta\Theta')^\dagger\Theta BK=\Theta'(\Theta\Theta')^\dagger AK=\Theta'(\Theta\Theta')^\dagger A\Phi'\Phi=\Theta'U\Phi.\]
 
+Now, to make the form convex, we need other structures on $L$. We rewrite Postulate 1 so that it holds for \emph{normalized} kernel matrix.
+
+\textbf{Postulate 3.} The loss $L(Z,\Theta)$ can be written as $L^n(\Theta'Z,\Theta'(\Theta\Theta')^\dagger)$, where $L^n$ is jointly convex
+in both arguments. Here the $n$ of $L^n$ emphasizes the use of normalized kernels.
+
+By Postulate 3, \eqref{dnn5} can be rewritten as
+\begin{equation}\label{dnn6}
+L^n(S,M)+\frac{1}{2}\tr(SK^\dagger S'),\quad\text{where }S\in M\mathbb{R}K.
+\end{equation}
+which is jointly convex in $S,M,K$. Compared to \eqref{dnn4}, one can see that the output kernel $N$ has been removed from the regularization. What's more, the feasible region $\left\lbrace (S,M,K):M\succeq0,K\succeq0,S\in M\mathbb{R}K\right\rbrace$ is also convex.
+
+Now, we can apply \eqref{dnn3} to the first two layers and \eqref{dnn6} to the output layer, so that the objective in \eqref{dnn} becomes
+\begin{equation}\label{obj}
+	\begin{aligned}
+	&L_1^n(S_1,M_1)+\frac{1}{2}\tr(S_1K^\dagger S_1')\\
+	+&L_2^n(S_2,M_2)+\frac{1}{2}\tr(S_2M_1^\dagger S_2')\\
+	+&L_3(Z_3,Y)+\frac{1}{2}\tr(Z_3M_2^\dagger Z_3'),
+	\end{aligned}
+\end{equation}
+
+where $S_1\in M_1\mathbb{R}K$, $S_2\in M_2\mathbb{R}M_1$ , and $Z_3\in \mathbb{R}M_2$.
+
+Recall that we should make the domain of $M$ convex and the loss functions $L^n$ satisfy postulate 3.
+
+The output kernels $M:=\Theta'(\Theta\Theta')^\dagger\Theta$ has no convex domain in general. We want to relax $M$, such that they preserve the nice properties including
+\[M\succeq0,M\preceq I,\tr(M)=\tr((\Theta\Theta')^\dagger(\Theta\Theta'))=\rank(\Theta\Theta')=\rank(\Theta),\]
+for any $\Theta$. Here, $M\succeq0$ denotes that $M$ is a symmetric semi-positive matrix. So, given a number of hidden nodes, $h$, we will enforce $\tr(M)=h$. We further relax the property $\lambda_{M}=\left\lbrace 0,1\right\rbrace $ to $\forall \lambda_i\in\lambda_{M}$, $0\leq \lambda_i\leq 1$. A final relaxation would be $M\mathbf{1}=\mathbf{1}$, which holds when $\Theta$ expresses target values for a multiclass classification, i.e. $\Theta_{ij}\in\left\lbrace 0,1\right\rbrace$, $\Theta'\mathbf{1}=1$, representing each index of the cluster.
+
+We then relax $M$ to the followings domain,
+\begin{equation}\label{mdomain}
+	\mathcal{M}:=\left\lbrace M|0\preceq M\preceq I,M\mathbf{1}=\mathbf{1},\tr(M)=h\right\rbrace.
+\end{equation}
+
+The last thing is to give a appropriate loss function. An example was put in \cite{aslan2013convex}, which use a large margin, multi-label loss
+\[\tilde{L}(z,y)=\max(1-y+kz-\mathbf{1}(y'z))\]
+where $z$ is a linear response and $y\in\left\lbrace 0,1\right\rbrace^h $ is the target vector. This example can be adapted to a normalized case as follows. We first generalize the notion of margin to consider a \emph{normalized label} $(YY')^\dagger y$:
+\[L(z,y)=\max(1-(YY')^\dagger y+kz-\mathbf{1}(y'z)).\]
+Then, given $t$ input-output pairs $(Z,Y)$, we can rewrite the loss to a compact form as
+\[L(Z,Y)=\sum_jL(z_j,y_j)= \tau(kZ−(YY')^\dagger Y)+t−\tr(Y'Z),\]
+where $\tau(X):=\sum_j\max_i X_{ij}$. As a result, the loss below can be shown to satisfy Postulate 3,
+\begin{equation}\label{dnnloss}
+L^n(S,M)=\tau(S-\frac{1}{k}M)+t-tr(S),\quad\text{where }S=Y'Z,M=Y'(YY')^\dagger Y.
+\end{equation}
+Thus, by \eqref{obj}, \eqref{mdomain} and \eqref{dnnloss}, we reformulate the original three-layer NN problem to a convex form.
 
 \section{The Construction of A Two-layer CCNN}
 A two-layer CCNN can be written as a function $f:\mathbb{R}^{d_0}\rightarrow\mathbb{R}^{d_2}$, which takes in a vector $x$ that is often the vector-representation of a picture. In the context of this review, the output $f(x)$ is a discrete distribution vector, i.e. the $k$th element $f_k(x)\in\left[0,1\right] $ denotes the probability of $x$ belonging to class $k$.
